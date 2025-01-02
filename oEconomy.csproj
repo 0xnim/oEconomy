@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+    
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <PreserveCompilationContext>false</PreserveCompilationContext>
@@ -8,9 +9,12 @@
         <EnableDynamicLoading>true</EnableDynamicLoading>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 
+        <!-- These properties are used for packing the plugin into a compressed format. -->
         <PluginAssembly>oEconomy</PluginAssembly>
-        <PluginVersion>1.0.0</PluginVersion>
+        <PluginVersion>1.0.0.0</PluginVersion>
         <PluginApiVersion>1.0.0</PluginApiVersion>
+        <PluginPublishDir>bin/$(Configuration)/</PluginPublishDir>
+        <RootNamespace>oEconomy</RootNamespace>
 
         <!--<PluginPublishDir></PluginPublishDir> Optional: The location where the msbuild task will look for your build output to pack your plugin-->
 
@@ -25,7 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Obsidian.API" Version="1.0.0-nightly-46">
+        <PackageReference Include="Obsidian.API" Version="1.0.0-nightly-47">
             <Private>false</Private>
             <ExcludeAssets>runtime</ExcludeAssets>
         </PackageReference>
