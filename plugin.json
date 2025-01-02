@@ -6,5 +6,12 @@
       "Nim"
     ],
     "description": "An economy plugin for Obsidian.",
-    "projectUrl": "https://github.com/0xnimq/oEconomy"
+    "projectUrl": "https://github.com/0xnimq/oEconomy",
+    "dependencies": [
+      {
+        "id": "com.nimq.vault",
+        "version": "1.0.0",
+        "required": true
+      }
+    ]
   }
