@@ -36,6 +36,12 @@
         </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="ObsidianVault">
+        <HintPath>..\ObsidianPlugin\ObsidianVault\obj\Release\ObsidianVault.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
     <!--Can be used to move the plugin after its been packed useful when debugging ^ ^ -->
     <!--<Target Name="MovePlugin" AfterTargets="PackPlugin">
         <Move SourceFiles="$(PluginPublishDir)/$(PluginName).obby" DestinationFolder="{YOUR DESTINATION HERE}" />

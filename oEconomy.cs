@@ -7,34 +7,11 @@ public sealed class oEconomy : PluginBase
     // Optional dependencies may be injected at any time, if at all
     [Inject] public ILogger<oEconomy> Logger { get; set; }
 
-    //You can register services, commands and events here if you'd like
-    public override void ConfigureServices(IServiceCollection services)
-    {
-    }
-
     //You can register commands, events and soon to be items, blocks and entities
     public override void ConfigureRegistry(IPluginRegistry registry)
     {
         //Will scan for command classes and register them for you
         registry.MapCommands();
-
-        //Will scan for classes that inherit from MinecraftEventHandler
-        registry.MapEvents();
-
-        //For those coming from the web side of .net these will seem familiar to you.
-        //You're able to register commands through a "minimal api" like approach
-        registry.MapCommand("test",
-            [CommandInfo("test command")] async (CommandContext ctx, int number, int otherNumber) =>
-            {
-                await ctx.Player.SendMessageAsync(
-                    $"Test #{number} and #{otherNumber}. This command was executed from the MinimalAPI.");
-            });
-
-        //As above so below :))
-        registry.MapEvent((IncomingChatMessageEventArgs chat) =>
-        {
-            this.Logger.LogDebug("Got a chat message! From MinimalAPI event.");
-        });
     }
 
     //Called when the plugin has fully loaded

@@ -5,3 +5,5 @@ global using Obsidian.API.Commands;
 global using Obsidian.API.Events;
 global using Obsidian.API.Plugins;
 global using System.Threading.Tasks;
+
+global using ObsidianVault;

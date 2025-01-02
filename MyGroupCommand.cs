@@ -1,24 +1,36 @@
 ﻿namespace oEconomy;
 
 //All command modules are created with a scoped lifetime
-[CommandGroup("mygroupCommand")]
+[CommandGroup("eco")]
 public class MyGroupCommand : CommandModuleBase
 {
     [Inject] public ILogger<MyGroupCommand> Logger { get; set; }
-
-    [Command("subtract")]
-    [CommandInfo("woop dee doo this command is from a plugin")]
-    public async Task Subtract(int a, int b)
+    [Inject] public VaultApi VaultApi { get; set; }
+    
+    [Command("give")]
+    [CommandInfo("Gives a player money out of thin air.")]
+    public async Task Give(string playerName, int a)
     {
-        Logger.LogInformation("Subtracted {a}-{b}={c}", a, b, a - b);
-        await this.Player.SendMessageAsync($"Subtracted {a}-{b}={a - b}");
+        VaultApi.AddBalance(playerName, a);
+        Logger.LogInformation("Added {a} to {playerName}", a, playerName);
+    }
+    
+    [Command("take")]
+    [CommandInfo("Takes a players money.")]
+    public async Task Take(string playerName, int a)
+    {
+        VaultApi.DeductBalance(playerName, a);
+        Logger.LogInformation("Took {a} from {playerName}", a, playerName);
+    }
+    
+    [Command("set")]
+    [CommandInfo("Sets players money to a value.")]
+    public async Task Set(string playerName, int a)
+    {
+        var initialBalance = VaultApi.GetBalance(playerName);
+        VaultApi.DeductBalance(playerName, initialBalance);
+        VaultApi.AddBalance(playerName, a);
+        Logger.LogInformation("Set {playerName} balance to {a}", playerName, a);
     }
 
-    [Command("add")]
-    [CommandInfo("woop dee doo this command is from a plugin")]
-    public async Task Add(int a, int b)
-    {
-        Logger.LogInformation("Added {a}+{b}={c}", a, b, a + b);
-        await this.Player.SendMessageAsync($"Added {a}+{b}={a + b}");
-    }
 }
