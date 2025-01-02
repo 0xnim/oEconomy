@@ -1,0 +1,10 @@
+{
+    "name": "oEconomy",
+    "id": "com.nimq.oeconomy",
+    "version": "1.0.0",
+    "authors": [
+      "Nim"
+    ],
+    "description": "An economy plugin for Obsidian.",
+    "projectUrl": "https://github.com/0xnimq/oEconomy"
+  }
