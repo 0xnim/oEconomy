@@ -1,4 +1,8 @@
-﻿namespace oEconomy;
+﻿using System;
+using System.Linq;
+using System.Text;
+
+namespace oEconomy;
 
 //All command modules are created with a scoped lifetime
 [RequirePermission(PermissionCheckType.Any, true, "eco.admin")]
@@ -10,53 +14,112 @@ public class EconomyCommand : CommandModuleBase
     
     [Command("give")]
     [CommandInfo("Gives a player money out of thin air.")]
-    public async Task Give(string playerName, int a)
+    public async Task Give(IPlayer player, int amount)
     {
-        VaultApi.AddBalance(playerName, a);
-        Logger.LogInformation("Added {a} to {playerName}", a, playerName);
+        VaultApi.AddBalance(player.Uuid.ToString(), amount);
+        this.Player.SendMessageAsync($"Gave {amount} to {player.Username}");
     }
 
     [Command("take")]
     [CommandInfo("Takes a players money.")]
-    public async Task Take(string playerName, int a)
+    public async Task Take(IPlayer player, int amount)
     {
-        VaultApi.DeductBalance(playerName, a);
-        Logger.LogInformation("Took {a} from {playerName}", a, playerName);
+        VaultApi.DeductBalance(player.Uuid.ToString(), amount);
+        this.Player.SendMessageAsync($"Took {amount} from {player.Username}");
     }
 
     [Command("set")]
     [CommandInfo("Sets players money to a value.")]
-    public async Task Set(string playerName, int a)
+    public async Task Set(IPlayer player, int amount)
     {
-        var initialBalance = VaultApi.GetBalance(playerName);
-        VaultApi.DeductBalance(playerName, initialBalance);
-        VaultApi.AddBalance(playerName, a);
-        Logger.LogInformation("Set {playerName} balance to {a}", playerName, a);
+        if (amount < 0)
+        {
+            this.Player.SendMessageAsync($"You cannot set a negative amount.");
+            return;
+        }
+        var initialBalance = VaultApi.GetBalance(player.Uuid.ToString());
+        VaultApi.DeductBalance(player.Uuid.ToString(), initialBalance);
+        VaultApi.AddBalance(player.Uuid.ToString(), amount);
+        this.Player.SendMessageAsync($"{player.Username}'s balance has been set to {amount}");
     }
 }
-
-[CommandGroup("balance", "bal")]
-public class BalanceCommands : CommandModuleBase
+public class OtherCommands : CommandModuleBase
 {
-    [Inject] public ILogger<BalanceCommands> Logger { get; set; }
+    [Inject] public ILogger<OtherCommands> Logger { get; set; }
     [Inject] public VaultApi VaultApi { get; set; }
 
-    [Command("")]
+    [Command("balance", "bal")]
     [CommandInfo("Gets the balance of a player.")]
     public async Task Balance()
     {
-        var playerName = this.CommandContext.Player.Username;
-        var balance = VaultApi.GetBalance(playerName);
-        //Logger.LogInformation("You have a balance of {balance}", balance);
+        var player = this.Player;
+        var balance = VaultApi.GetBalance(player.Uuid.ToString());
         await this.Player.SendMessageAsync($"You have a balance of {balance}");
     }
     
-    [Command("")]
+    [Command("balance", "bal")]
     [CommandOverload]
-    public async Task BalanceOther(string playerName)
+    public async Task Balance(IPlayer player)
     {
-        var balance = VaultApi.GetBalance(playerName);
-        Logger.LogInformation("{playerName} has a balance of {balance}", playerName, balance);
-        await this.Player.SendMessageAsync($"{playerName} has a balance of {balance}");
+        var balance = VaultApi.GetBalance(player.Uuid.ToString());
+        Logger.LogInformation("{playerName} has a balance of {balance}", player.Username, balance);
+        await this.Player.SendMessageAsync($"{player.Username} has a balance of {balance}");
     }
-}
+    
+    [Command("pay")]
+    [CommandInfo("Pay a player money.")]
+    public async Task Pay(IPlayer otherPlayer, int amount)
+    {
+        var player = this.Player;
+        if (amount < 0)
+        {
+            player.SendMessageAsync($"You cannot pay a negative amount.");
+            return;
+        }
+        var initialBalance = VaultApi.GetBalance(player.Uuid.ToString());
+        if (initialBalance < amount)
+        {
+            player.SendMessageAsync($"You do not have enough money.");
+            return;
+        }
+        VaultApi.DeductBalance(player.Uuid.ToString(), amount);
+        VaultApi.AddBalance(otherPlayer.Uuid.ToString(), amount);
+        player.SendMessageAsync($"You have paid {amount} to {otherPlayer.Username}");
+        otherPlayer.SendMessageAsync($"You have been paid {amount} by {player.Username}");
+    }
+    
+    [Command("baltop")]
+    [CommandInfo("Gets the players with the highest balance.")]
+    public async Task Baltop()
+    {
+        var baltop = VaultApi.GetData()
+            .OrderByDescending(x => x.Value)
+            .Take(10) // Limit to top 10 players
+            .ToList();
+
+        var player = this.Player;
+
+        if (!baltop.Any())
+        {
+            await player.SendMessageAsync("There are no players with a balance.");
+            return;
+        }
+
+        var resultMessage = new StringBuilder("The players with the highest balance are:\n");
+        foreach (var entry in baltop)
+        {
+            var serverPlayer = this.Server.GetPlayer(Guid.Parse(entry.Key));
+            if (serverPlayer != null)
+            {
+                resultMessage.AppendLine($"{serverPlayer.Username} - {entry.Value:F2}");
+            }
+            else
+            {
+                resultMessage.AppendLine($"Unknown Player ({entry.Key}) - {entry.Value:F2}");
+            }
+        }
+
+        await player.SendMessageAsync(resultMessage.ToString());
+    }
+
+}   
