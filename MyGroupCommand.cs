@@ -5,13 +5,14 @@ using System.Text;
 namespace oEconomy;
 
 //All command modules are created with a scoped lifetime
-[RequirePermission(PermissionCheckType.Any, true, "eco.admin")]
+// setting the permission for a commandgroup does not work
 [CommandGroup("eco")]
 public class EconomyCommand : CommandModuleBase
 {
     [Inject] public ILogger<EconomyCommand> Logger { get; set; }
     [Inject] public VaultApi VaultApi { get; set; }
     
+    [RequirePermission(PermissionCheckType.Any, true, "eco.admin")]
     [Command("give")]
     [CommandInfo("Gives a player money out of thin air.")]
     public async Task Give(IPlayer player, int amount)
@@ -19,7 +20,8 @@ public class EconomyCommand : CommandModuleBase
         VaultApi.AddBalance(player.Uuid.ToString(), amount);
         this.Player.SendMessageAsync($"Gave {amount} to {player.Username}");
     }
-
+    
+    [RequirePermission(PermissionCheckType.Any, true, "eco.admin")]
     [Command("take")]
     [CommandInfo("Takes a players money.")]
     public async Task Take(IPlayer player, int amount)
@@ -28,6 +30,7 @@ public class EconomyCommand : CommandModuleBase
         this.Player.SendMessageAsync($"Took {amount} from {player.Username}");
     }
 
+    [RequirePermission(PermissionCheckType.Any, true, "eco.admin")]
     [Command("set")]
     [CommandInfo("Sets players money to a value.")]
     public async Task Set(IPlayer player, int amount)
@@ -62,7 +65,6 @@ public class OtherCommands : CommandModuleBase
     public async Task Balance(IPlayer player)
     {
         var balance = VaultApi.GetBalance(player.Uuid.ToString());
-        Logger.LogInformation("{playerName} has a balance of {balance}", player.Username, balance);
         await this.Player.SendMessageAsync($"{player.Username} has a balance of {balance}");
     }
     
