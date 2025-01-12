@@ -94,10 +94,7 @@ public class OtherCommands : CommandModuleBase
     [CommandInfo("Gets the players with the highest balance.")]
     public async Task Baltop()
     {
-        var baltop = VaultApi.GetData()
-            .OrderByDescending(x => x.Value)
-            .Take(10) // Limit to top 10 players
-            .ToList();
+        var baltop = VaultApi.GetTopBalances(10);
 
         var player = this.Player;
 
