@@ -1,6 +1,9 @@
 # [oEconomy](https://harbr.dev/plugin/oeconomy)
 
 Welcome to the Economy Plugin for ObsidianMC! This plugin provides essential economy management features for your server, allowing admins to control player balances and enabling players to interact with their in-game currency.
+---
+### Releases
+You can find all releases [here](https://harbr.dev/plugin/oeconomy/versions).
 
 ---
 
